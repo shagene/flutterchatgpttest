@@ -30,6 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    chatGPT?.close();
     _subscription?.cancel();
     super.dispose();
   }
@@ -47,13 +48,14 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
 
     final request = CompleteReq(
-        prompt: message.text, model: kTranslateModelV3, max_tokens: 4000);
+        prompt: message.text, model: kTranslateModelV3, max_tokens: 2000);
 
     _subscription = chatGPT!
-        .builder("token", orgId: "")
+        .builder("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",baseOption: HttpSetup(receiveTimeout: 7000))
         .onCompleteStream(request: request)
+        .asBroadcastStream()
         .listen((response) {
-      Vx.log(response!.choices[0].text);
+      Vx.log(response!.choices.last.text);
       ChatMessage botMessage =
           ChatMessage(text: response.choices[0].text, sender: "bot");
 
